@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Tech-Nest Safety Check-up</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: one calm reading column; a single question card at a time, results as a ranked checklist, team reference tables below. */
+:root {
+  --bg: #f4f7f5;
+  --surface: #ffffff;
+  --fg: #17241f;
+  --muted: #4b5d56;
+  --line: #d3ded8;
+  --accent: #1f5d52;      /* spruce */
+  --accent-ink: #ffffff;
+  --accent-soft: #e2efea;
+  --crit: #a3271f; --crit-soft: #fbe7e4;
+  --high: #a8520a; --high-soft: #fdeedd;
+  --med: #6b5a00;  --med-soft: #f7f1cf;
+  --low: #2f5d8a;  --low-soft: #e3edf7;
+  --good: #23683b; --good-soft: #e1f2e6;
+  --focus: #e0a100;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
+  font-size: 112.5%;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1714; --surface: #17221e; --fg: #e8f0ec; --muted: #a9bbb3; --line: #2d3d37;
+  --accent: #7cc7b4; --accent-ink: #0b1a16; --accent-soft: #1d332d;
+  --crit: #ff9c92; --crit-soft: #3a1d1a; --high: #f6b06a; --high-soft: #3a2a17;
+  --med: #e3cf6a; --med-soft: #33300f; --low: #9cc4ee; --low-soft: #1a2a3b;
+  --good: #8fd6a4; --good-soft: #17301f; --focus: #ffc94a; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1714; --surface: #17221e; --fg: #e8f0ec; --muted: #a9bbb3; --line: #2d3d37;
+  --accent: #7cc7b4; --accent-ink: #0b1a16; --accent-soft: #1d332d;
+  --crit: #ff9c92; --crit-soft: #3a1d1a; --high: #f6b06a; --high-soft: #3a2a17;
+  --med: #e3cf6a; --med-soft: #33300f; --low: #9cc4ee; --low-soft: #1a2a3b;
+  --good: #8fd6a4; --good-soft: #17301f; --focus: #ffc94a; color-scheme: dark; }
+:root.big { font-size: 131%; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 1rem; line-height: 1.6; }
+.wrap { max-width: 46rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wide { max-width: 64rem; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.2; text-wrap: balance; margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+header.top { border-bottom: 1px solid var(--line); background: var(--surface); }
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; letter-spacing: .06em; }
+.brand small { font-family: var(--body); font-weight: 400; letter-spacing: 0; color: var(--muted); font-size: .85rem; }
+.nest { width: 34px; height: 34px; flex: none; }
+.tools { display: flex; gap: 8px; }
+
+button, .btn { font: inherit; cursor: pointer; border-radius: 10px; border: 2px solid var(--accent); padding: .6rem 1.1rem; background: var(--surface); color: var(--accent); font-weight: 700; min-height: 48px; }
+button.primary { background: var(--accent); color: var(--accent-ink); }
+button.small { min-height: 40px; padding: .35rem .8rem; font-size: .9rem; }
+button.link { border: none; background: none; padding: .4rem 0; text-decoration: underline; color: var(--muted); font-weight: 400; min-height: 0; }
+button:hover { filter: brightness(1.06); }
+
+main { padding-block: 28px 56px; display: grid; gap: 40px; }
+.hero { display: grid; gap: 14px; }
+.hero h1 { font-size: clamp(1.9rem, 5vw, 2.7rem); font-weight: 800; }
+.hero p { margin: 0; max-width: 38rem; font-size: 1.08rem; }
+.privacy { display: flex; gap: 10px; align-items: flex-start; background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; font-size: .95rem; }
+.privacy svg { flex: none; margin-top: 3px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 12px; margin: 4px 0 0; padding: 0; list-style: none; }
+.facts li { border-top: 2px solid var(--line); padding-top: 8px; font-size: .95rem; color: var(--muted); }
+.facts b { display: block; color: var(--fg); font-family: var(--display); font-size: 1.15rem; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: clamp(18px, 4vw, 30px); }
+.progress { display: grid; gap: 6px; margin-bottom: 18px; }
+.progress .meta { display: flex; justify-content: space-between; font-size: .9rem; color: var(--muted); gap: 8px; flex-wrap: wrap; }
+.bar { height: 10px; background: var(--accent-soft); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .25s; }
+.eyebrow { text-transform: uppercase; letter-spacing: .09em; font-size: .78rem; font-weight: 700; color: var(--accent); margin: 0 0 6px; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+legend { font-family: var(--display); font-weight: 600; font-size: 1.4rem; line-height: 1.3; padding: 0; margin-bottom: 8px; text-wrap: balance; }
+.help { color: var(--muted); margin: 0 0 14px; font-size: .95rem; }
+.opts { display: grid; gap: 10px; }
+.opt { display: flex; gap: 12px; align-items: flex-start; border: 2px solid var(--line); border-radius: 12px; padding: 14px; cursor: pointer; background: var(--surface); }
+.opt:hover { border-color: var(--accent); }
+.opt input { width: 1.4rem; height: 1.4rem; flex: none; margin: .1rem 0 0; accent-color: var(--accent); }
+.opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; flex-wrap: wrap; align-items: center; }
+
+.summary { display: grid; gap: 14px; }
+.summary h2 { font-size: clamp(1.6rem, 4.5vw, 2.2rem); font-weight: 800; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 99px; padding: 3px 12px; font-size: .85rem; font-weight: 700; white-space: nowrap; }
+.pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.l-critical { color: var(--crit); background: var(--crit-soft); }
+.l-high { color: var(--high); background: var(--high-soft); }
+.l-medium { color: var(--med); background: var(--med-soft); }
+.l-low { color: var(--low); background: var(--low-soft); }
+.l-good { color: var(--good); background: var(--good-soft); }
+.group { display: grid; gap: 14px; }
+.group > h3 { font-size: 1.3rem; margin-top: 10px; }
+.group > p { margin: -8px 0 0; color: var(--muted); }
+details.fold { display: block; }
+details.fold > summary { cursor: pointer; list-style: none; display: grid; gap: 2px; padding: 14px 16px; border: 2px dashed var(--line); border-radius: 12px; color: var(--muted); }
+details.fold > summary::-webkit-details-marker { display: none; }
+details.fold > summary h3 { font-size: 1.3rem; color: var(--fg); }
+details.fold > summary h3::after { content: " +"; color: var(--accent); }
+details.fold[open] > summary h3::after { content: " −"; }
+details.fold > .group { margin-top: 14px; }
+.action { background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 10px; }
+.action.critical { border-left-color: var(--crit); } .action.high { border-left-color: var(--high); }
+.action.medium { border-left-color: var(--med); } .action.low { border-left-color: var(--low); }
+.action header { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
+.action h4 { font-family: var(--display); font-size: 1.15rem; margin: 0; line-height: 1.3; flex: 1 1 16rem; }
+.action .time { font-size: .85rem; color: var(--muted); }
+.why { font-size: .93rem; color: var(--muted); margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+.why li::before { content: "You said: "; font-weight: 700; color: var(--fg); }
+.action ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 6px; }
+.res { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .93rem; }
+.strengths { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.strengths li { display: flex; gap: 10px; align-items: flex-start; background: var(--good-soft); border-radius: 10px; padding: 10px 14px; }
+.strengths svg { flex: none; margin-top: 4px; color: var(--good); }
+.share { display: grid; gap: 8px; border: 2px solid var(--accent); border-radius: 12px; padding: 16px 18px; }
+.share h3 { font-size: 1.2rem; }
+.share p { margin: 0; }
+button:disabled { opacity: .6; cursor: default; }
+.opt input[type="checkbox"] { border-radius: 4px; }
+.callout { border: 2px solid var(--crit); border-radius: 12px; padding: 14px 16px; display: grid; gap: 4px; }
+.callout b { color: var(--crit); }
+
+section.team { display: grid; gap: 14px; }
+section.team h2 { font-size: 1.5rem; }
+section.team > p { margin: 0; color: var(--muted); max-width: 42rem; }
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: .78rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td.nowrap { white-space: nowrap; }
+td ul { margin: 0; padding-left: 1.1rem; }
+.counts { display: flex; gap: 4px; flex-wrap: wrap; }
+.counts .pill { padding: 1px 8px; font-size: .78rem; }
+footer { border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+footer .wrap { padding-block: 20px 32px; display: grid; gap: 6px; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 10px 18px; border-radius: 10px; font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="top">
+  <div class="wrap wide">
+    <div class="brand">
+      <svg class="nest" viewBox="0 0 40 40" aria-hidden="true"><path d="M4 22c4 9 28 9 32 0" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/><path d="M7 26c5 6 21 6 26 0M10 30c4 3 16 3 20 0" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" opacity=".6"/><path d="M20 6l9 4v6c0 5-4 8-9 10-5-2-9-5-9-10v-6z" fill="var(--accent)"/><path d="M16 15l3 3 5-6" fill="none" stroke="var(--accent-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div>TECH-NEST<br><small>Digital Safety Guide</small></div>
+    </div>
+    <div class="tools">
+      <button class="small" id="sizeBtn" aria-pressed="false">Larger text</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap wide">
+  <div class="wrap" style="padding:0">
+    <!-- INTRO -->
+    <section id="intro" class="hero">
+      <p class="eyebrow">Free digital safety check-up</p>
+      <h1>Find the few changes that will keep you safest online</h1>
+      <p>Answer 18 short questions about how you use your phone, computer and online accounts. You'll get a personal, plain-language plan with the most important steps first, and links to trusted Canadian resources.</p>
+      <div class="privacy">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" fill="var(--accent)"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="var(--accent)" stroke-width="2"/></svg>
+        <span><b>Your answers stay on this device</b> unless you choose to share them anonymously at the end. There are no wrong answers, so please answer honestly.</span>
+      </div>
+      <div class="row">
+        <button class="primary" id="startBtn">Start the check-up</button>
+        <button id="resumeBtn" hidden>Continue where I left off</button>
+      </div>
+      <ul class="facts">
+        <li><b>About 7 minutes</b>One question at a time. Skip any you like.</li>
+        <li><b>Plain language</b>No tech knowledge needed.</li>
+        <li><b>Made for Canada</b>Interac, Canadian carriers, the Anti-Fraud Centre.</li>
+      </ul>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz" class="card" hidden aria-live="polite"></section>
+
+    <!-- RESULTS -->
+    <section id="results" hidden></section>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap wide">
+    <div>Tech-Nest Digital Safety Guide · prototype, November 2026.</div>
+    <div>This guide gives general safety tips, not professional advice. If you think you've lost money to a scam, call your bank first, then the Canadian Anti-Fraud Centre at 1-888-495-8501.</div>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+/* ---------------- QUESTIONS ---------------- */
+const QUESTIONS = [
+  { id: "pw", short: "Passwords", topic: "Accounts and passwords", text: "How do you keep track of your passwords?", options: [
+    { v: "a", label: "I reuse two or three passwords across most of my accounts." },
+    { v: "b", label: "My web browser or phone saves them for me (Chrome, Safari, Edge, Apple Passwords)." },
+    { v: "c", label: "I use a password manager app (for example Bitwarden, 1Password or Proton Pass)." },
+    { v: "d", label: "I write different passwords in a notebook I keep at home." } ] },
+  { id: "tfa", short: "Two-step verification", topic: "Accounts and passwords", text: "When you sign in to email or your bank, how do you confirm it's really you?", help: "This extra step is called two-step verification or 2FA.", options: [
+    { v: "a", label: "A code is sent to me by text message (SMS)." },
+    { v: "b", label: "An authenticator app, a passkey, or a pop-up I approve on my phone." },
+    { v: "c", label: "I only type my password. There is no extra step." },
+    { v: "d", label: "I'm not sure." } ] },
+  { id: "carrier", short: "Phone provider", topic: "Accounts and passwords", text: "Which mobile phone provider do you use?", help: "We ask because the steps to protect your phone number differ by provider.", options: [
+    { v: "a", label: "Rogers, Bell or Telus" },
+    { v: "b", label: "Fido, Koodo, Virgin Plus, Freedom, Chatr, Public Mobile, Lucky Mobile or another Canadian brand" },
+    { v: "c", label: "A U.S. provider (AT&T, Verizon, T-Mobile or another)" },
+    { v: "d", label: "I don't have a mobile phone, or I'm not sure" } ] },
+  { id: "bank", short: "Online banking", topic: "Money", text: "How do you usually get to your online banking?", options: [
+    { v: "a", label: "I tap or click links in emails or text messages about my account." },
+    { v: "b", label: "I use my bank's official app, a saved bookmark, or I type the address myself." },
+    { v: "c", label: "I mostly use money apps like PayPal, Wise, Wealthsimple or KOHO." },
+    { v: "d", label: "I don't bank online." } ] },
+  { id: "money", short: "Sending money", topic: "Money", text: "How do you usually send or receive money online?", options: [
+    { v: "a", label: "Interac e-Transfer with a security question and answer." },
+    { v: "b", label: "Interac e-Transfer with Autodeposit turned on." },
+    { v: "c", label: "Credit card, or apps like PayPal." },
+    { v: "d", label: "I rarely or never send money online." } ] },
+  { id: "calls", short: "Scam calls", topic: "Scams", text: "You get an unexpected call, text or email saying there's an urgent problem. It may claim to be the CRA, your bank, the police, Amazon, or a grandchild in trouble. What do you usually do?", options: [
+    { v: "a", label: "I follow their instructions, or call the number they give me." },
+    { v: "b", label: "I hang up or ignore it, then contact the organization using a number I find myself." },
+    { v: "c", label: "I'm not sure what I would do." } ] },
+  { id: "remote", short: "Remote access", topic: "Scams", text: "If a caller or a pop-up on your screen said your computer had a virus and offered to fix it, would you let them connect to your computer?", options: [
+    { v: "a", label: "Yes, if they seemed professional or said they were from Microsoft, Apple or my internet provider." },
+    { v: "b", label: "No. I only let someone I know and contacted myself work on my devices." },
+    { v: "c", label: "I'm not sure." } ] },
+  { id: "updates", short: "Software updates", topic: "Your devices", text: "How do you handle software updates on your phone and computer?", options: [
+    { v: "a", label: "I put them off until I'm forced to, or ignore them." },
+    { v: "b", label: "Automatic updates are on and I install them within a few days." },
+    { v: "c", label: "I don't know how to check, or someone else looks after it." },
+    { v: "d", label: "My device is old and doesn't get updates anymore." } ] },
+  { id: "lock", short: "Phone lock", topic: "Your devices", text: "How is your phone locked?", options: [
+    { v: "a", label: "It isn't locked. Anyone can pick it up and open it." },
+    { v: "b", label: "With a PIN of 6 or more digits, a password, fingerprint or face." },
+    { v: "c", label: "With a short or simple code, like 1234, my birth year, or a simple pattern." } ] },
+  { id: "backup", short: "Backups", topic: "Your devices", text: "If your phone or computer was lost or broken tomorrow, would your photos and files be safe?", options: [
+    { v: "a", label: "No, they're only on the device." },
+    { v: "b", label: "Yes, they back up automatically (iCloud, Google, OneDrive, or an external drive)." },
+    { v: "c", label: "I back up now and then, or I'm not sure." } ] },
+  { id: "wifi", short: "Wi-Fi away from home", topic: "Going online", text: "How do you connect to the internet when you're away from home?", options: [
+    { v: "a", label: "I often use free public Wi-Fi (coffee shops, airports, hotels, malls)." },
+    { v: "b", label: "I use my phone's mobile data or personal hotspot." },
+    { v: "c", label: "I use public Wi-Fi only when needed, and don't log in to banking or email on it." },
+    { v: "d", label: "I don't go online away from home." } ] },
+  { id: "social", short: "Social media", topic: "Going online", text: "How do you use social media (Facebook, Instagram, TikTok and others)?", options: [
+    { v: "a", label: "My profile is public and I share things like my birthday, travel plans or location." },
+    { v: "b", label: "My profile is private and I'm careful about what I share." },
+    { v: "c", label: "I don't use social media." } ] },
+  { id: "ai", short: "AI chat tools", topic: "Going online", text: "How do you use AI chat tools (ChatGPT, Claude, Copilot, Gemini)?", options: [
+    { v: "a", label: "I paste in personal notes, work files, or medical or money questions with real details." },
+    { v: "b", label: "Only for general questions, like recipes, writing help or public facts." },
+    { v: "c", label: "I rarely or never use them." } ] },
+  { id: "kids", short: "Children's devices", topic: "Family", text: "Do children or teens use devices in your home, or ones you look after (including grandchildren)?", options: [
+    { v: "a", label: "Yes, and we haven't set up parental controls or family rules." },
+    { v: "b", label: "Yes, with parental controls or family rules in place." },
+      { v: "c", label: "No." } ] },
+  { id: "probs", multi: true, topic: "Tech help", short: "Recent technical problems", text: "What technical problems have you had recently?", help: "Select all that apply.", options: [
+    { v: "slow", label: "Device running slowly" },
+    { v: "battery", label: "Battery draining quickly" },
+    { v: "wifi", label: "Wi-Fi or internet connection problems" },
+    { v: "printer", label: "Printer problems" },
+    { v: "crash", label: "Software crashing or freezing" },
+    { v: "install", label: "Trouble installing software" },
+    { v: "storage", label: "Running out of storage space" },
+    { v: "passwords", label: "Forgotten passwords or being locked out of accounts" },
+    { v: "av", label: "Audio, video or camera problems" },
+    { v: "email", label: "Email not working properly" },
+    { v: "files", label: "Trouble managing files or sharing documents" },
+    { v: "other", label: "Other" },
+    { v: "none", label: "None of these" } ] },
+  { id: "freq", topic: "Tech help", short: "How often problems happen", text: "How often do you have technical problems?", options: [
+    { v: "a", label: "Almost every day" },
+    { v: "b", label: "Weekly" },
+    { v: "c", label: "Monthly" },
+    { v: "d", label: "Occasionally" },
+    { v: "e", label: "Rarely" } ] },
+  { id: "fix", topic: "Tech help", short: "What they do when something goes wrong", text: "What do you usually do when something goes wrong with your device?", options: [
+    { v: "a", label: "Try to fix it myself" },
+    { v: "b", label: "Search Google or YouTube" },
+    { v: "c", label: "Ask family or friends" },
+    { v: "d", label: "Contact customer support" },
+    { v: "e", label: "Visit a repair shop" },
+    { v: "f", label: "Leave the problem unresolved" } ] },
+  { id: "confid", topic: "Tech help", short: "Troubleshooting confidence", text: "How confident are you fixing basic technical problems?", options: [
+    { v: "a", label: "Very confident" },
+    { v: "b", label: "Somewhat confident" },
+    { v: "c", label: "Not very confident" },
+    { v: "d", label: "I usually need help" } ] },
+];
+
+/* ---------------- ACTIONS (recommendation library) ---------------- */
+const L = (t, u) => ({ t, u });
+const R_GCS = L("Get Cyber Safe (Government of Canada)", "https://www.getcybersafe.gc.ca/");
+const R_CAFC = L("Canadian Anti-Fraud Centre", "https://antifraudcentre-centreantifraude.ca/");
+
+const ACTIONS = {
+  "search-safe": { title: "Watch out for fake support numbers when you search for help", mins: 2, steps: [
+    "Scammers pay for search ads and post fake 'support' phone numbers that look official.",
+    "Get a company's support number from its official website (type the address yourself), your bill, or the device's box or receipt.",
+    "Skip videos or sites that tell you to download a 'cleaner', 'booster' or 'repair' program. Many are scams or adware." ] },
+  "tech-helper": { title: "Line up reliable tech help", mins: 15, steps: [
+    "Choose one person you trust to be your go-to helper, and keep their number handy.",
+    "Many public libraries offer free one-on-one tech help, and Tech-Nest runs community workshops.",
+    "For device problems, use the maker's official support (Apple, Samsung, Microsoft) or your phone provider's store.",
+    "Write down what happened and any error message. It makes getting help much faster." ] },
+  "account-recovery": { title: "Set up account recovery so you don't get locked out", mins: 15, steps: [
+    "In your email, Apple, Google and bank accounts, check that your recovery phone number and backup email are current.",
+    "Save any backup codes on paper and keep them with your important papers.",
+    "A password manager (or a notebook kept at home) means you won't need to remember every password." ] },
+  "storage": { title: "Free up storage space", mins: 20, steps: [
+    "A full device can't install security updates or make backups, so this matters for safety too.",
+    "See what's using space: iPhone in Settings, General, iPhone Storage; Android in Settings, Storage; Windows in Settings, System, Storage.",
+    "Delete apps you don't use. Once your photos are safely backed up, let your phone remove the full-size copies (iCloud 'Optimize Storage' or Google Photos 'Free up space')." ] },
+  "slow-device": { title: "Speed up a slow or freezing device safely", mins: 15, steps: [
+    "Restart it at least once a week. This clears many slowdowns and freezes.",
+    "Install waiting updates, and remove apps you no longer use.",
+    "Don't install 'cleaner' or 'speed booster' apps. Most do little, and some are adware or scams.",
+    "If it's still very slow and several years old, it may no longer get updates. Check the maker's website for your model." ] },
+  "repair-shop": { title: "Protect your information before a repair", mins: 15, steps: [
+    "Back up your phone or computer before you hand it over.",
+    "Use a well-reviewed shop or the maker's authorized service, and get a written quote.",
+    "Don't give your passwords if you can avoid it. Ask if they can do the repair without signing in to your accounts." ] },
+  "email-first": { title: "Give your email account its own strong password", mins: 10, steps: [
+    "Your email can reset every other password, so protect it first.",
+    "Change your email password to a long passphrase you use nowhere else, such as four or more random words.",
+    "Check that the recovery phone number and backup email on the account are current." ], res: [R_GCS] },
+  "pm": { title: "Start using a password manager", mins: 30, steps: [
+    "Choose a well-known password manager. Bitwarden and Proton Pass have free plans; 1Password is paid.",
+    "Create one strong master passphrase. Write it down and keep it somewhere safe at home.",
+    "Let the app create a different password for each account. Start with email, then banking, then shopping.",
+    "Install it on your phone and computer so your passwords are with you everywhere." ],
+    res: [L("Bitwarden", "https://bitwarden.com/"), L("Proton Pass", "https://proton.me/pass"), L("1Password", "https://1password.com/")] },
+  "breach": { title: "Check if your email appeared in a data breach", mins: 5, steps: [
+    "Enter your email address at Have I Been Pwned, a free and respected service.",
+    "For each site listed, change that password. Change it anywhere else you used the same one." ],
+    res: [L("Have I Been Pwned", "https://haveibeenpwned.com/")] },
+  "passkeys": { title: "Use passkeys where they're offered", mins: 10, steps: [
+    "A passkey lets you sign in with your fingerprint, face or phone PIN instead of a password.",
+    "Passkeys can't be guessed, reused or typed into a fake website, so they stop most phishing.",
+    "Google, Apple, Microsoft, Amazon and PayPal offer them. Look for 'Passkeys' in each account's security settings." ] },
+  "browser-pw": { title: "Protect the account that holds your saved passwords", mins: 15, steps: [
+    "Saving passwords in your browser is much better than reusing them. The weak spot is the account they're stored in.",
+    "Chrome stores them in your Google account, Safari in your Apple account, and Edge in your Microsoft account. Turn on two-step verification for that account.",
+    "Run the built-in check for reused or leaked passwords: 'Password Checkup' in Google Password Manager, or 'Security recommendations' in Apple Passwords.",
+    "Never save passwords on a shared or public computer." ] },
+  "notebook": { title: "Keep your password notebook safe", mins: 5, steps: [
+    "A notebook kept at home is a reasonable choice, as long as each password is different.",
+    "Store it somewhere private at home, not in your wallet, purse or laptop bag.",
+    "Don't label it 'Passwords', and never write your bank card PIN in it.",
+    "Tell one trusted person where it is, in case they ever need to help you." ] },
+  "tfa-on": { title: "Turn on two-step verification", mins: 15, steps: [
+    "Start with your email, then your bank, social media and shopping accounts.",
+    "Look in each account's Settings, under Security or Sign-in, for 'two-step verification' or '2FA'.",
+    "Choose an authenticator app or passkey if offered. A text-message code is still much better than nothing.",
+    "Save the backup codes on paper and keep them with your important papers." ], res: [R_GCS] },
+  "tfa-check": { title: "Find out how your main accounts are protected", mins: 10, steps: [
+    "Open your email account's security page. For Gmail: myaccount.google.com/security. For Outlook or Hotmail: account.microsoft.com/security. On an iPhone: Settings, then your name, then Sign-In & Security.",
+    "Look for 'two-step verification'. If it says Off, turn it on.",
+    "If this feels hard, ask someone you trust to sit with you. It takes a few minutes per account." ] },
+  "tfa-app": { title: "Switch from text-message codes to an authenticator app or passkey", mins: 20, steps: [
+    "Install a free authenticator app such as Ente Auth, Google Authenticator or Microsoft Authenticator.",
+    "In your email account's security settings, choose 'authenticator app' and scan the QR code shown on screen.",
+    "Save the backup codes on paper. Then do the same for other important accounts.",
+    "Many Canadian banks only offer text-message codes. Keep those on, and lock your phone number with your provider (see the next step)." ],
+    res: [L("Ente Auth", "https://ente.io/auth/")] },
+  "carrier-lock": { title: "Lock your phone number with your provider", mins: 15, steps: (a) => {
+    const common = "Watch for this warning sign: if your phone suddenly shows 'No service' or 'SOS only' where it normally works, call your provider from another phone right away. It can mean someone moved your number to their SIM card.";
+    if (a.carrier === "c") return [
+      "U.S. providers have a free lock you can switch on: Verizon calls it Number Lock, AT&T calls it Wireless Account Lock, and T-Mobile calls it SIM Protection. Look in your provider's app or call them.",
+      "Also set an account PIN that isn't your birthday or the end of your phone number.", common ];
+    if (a.carrier === "d") return [
+      "Find your provider's name on your bill or in your phone's settings.",
+      "Then call them and ask for an account PIN, and ask that any SIM card change or number transfer require that PIN.", common ];
+    return [
+      a.carrier === "b"
+        ? "Smaller brands run on the big networks (for example Fido and Chatr on Rogers, Koodo and Public Mobile on Telus, Virgin Plus and Lucky Mobile on Bell), but you set your PIN with your own brand."
+        : "Call your provider, or sign in to your account online.",
+      "Ask them to add an account PIN or passcode, and to require it before any SIM card change or number transfer. The name of this feature varies, so describe what you want.",
+      "Pick a PIN that isn't your birthday, address or the end of your phone number.", common ];
+  } },
+  "bookmark": { title: "Reach your bank only through its app or a bookmark", mins: 5, steps: [
+    "Install your bank's official app from the App Store or Google Play, and check the publisher name matches your bank. Or save the bank's website as a bookmark.",
+    "Never sign in from a link in a text or email, even if it looks real. Scammers copy bank logos perfectly.",
+    "If a message worries you, close it and open your bank's app, or call the number on the back of your card." ] },
+  "7726": { title: "Report scam texts by forwarding them to 7726", mins: 2, steps: [
+    "Forward the suspicious text to 7726 (it spells SPAM on the keypad). Canadian providers use these reports to block scam numbers.",
+    "Then delete the message. Don't reply, even with STOP." ] },
+  "alerts": { title: "Turn on transaction alerts", mins: 5, steps: [
+    "In your bank's app, find Alerts or Notifications.",
+    "Ask for an alert for every purchase, withdrawal and e-Transfer, or for any amount over a small limit like $50.",
+    "You'll spot fraud within minutes, while it can still be stopped." ] },
+  "fintech": { title: "Lock down your money apps", mins: 15, steps: [
+    "Turn on two-step verification in each app you use, such as PayPal, Wise, Wealthsimple or KOHO.",
+    "Give each one a unique password, and download apps only from the official App Store or Google Play.",
+    "Turn on notifications for every payment so you see anything unusual right away." ] },
+  "autodeposit": { title: "Turn on Interac Autodeposit for money you receive", mins: 5, steps: [
+    "In your bank's app, find Interac e-Transfer settings, then Autodeposit, and register your email or phone number.",
+    "Money sent to you will go straight into your account. There's no security question for a scammer to guess or intercept.",
+    "Autodeposit protects money coming in. It doesn't make it safe to send money to someone you don't know." ],
+    res: [L("Interac: e-Transfer safety", "https://www.interac.ca/en/consumers/security/")] },
+  "etransfer-send": { title: "Send e-Transfers more safely", mins: 2, steps: [
+    "If the person has Autodeposit, your bank shows their registered name before you confirm. Check that it's who you expect.",
+    "If you must use a security question, pick an answer only they would know, and tell them by phone. Never put the answer in the e-Transfer message or the same email.",
+    "Once deposited, an e-Transfer usually can't be reversed. Only send money to people you know." ] },
+  "card-protect": { title: "Use payment methods with buyer protection", mins: 2, steps: [
+    "Credit cards protect you from fraud and let you dispute a charge if something never arrives.",
+    "In PayPal, pay for purchases with 'Goods and Services'. 'Friends and Family' payments have no purchase protection.",
+    "Treat any app transfer like handing over cash. Once it's sent, it's very hard to get back." ] },
+  "hangup": { title: "Use the 'hang up and call back' rule", mins: 2, steps: [
+    "Scammers create panic so you act fast. Any urgent call, text or email about money is a reason to slow down.",
+    "Hang up. Find the official number yourself, on the back of your card, a statement or the official website, and call them back.",
+    "The CRA, police and banks will never ask you to pay with gift cards, cryptocurrency or a Bitcoin ATM, and the CRA won't threaten arrest.",
+    "For 'grandchild in trouble' calls, agree on a family code word, and call your grandchild or their parents directly." ],
+    res: [R_CAFC, L("CRA: Scams and fraud", "https://www.canada.ca/en/revenue-agency/campaigns/fraud-scams.html")] },
+  "remote": { title: "Never let a caller connect to your computer", mins: 2, steps: [
+    "Microsoft, Apple, your bank and your internet provider don't call out of the blue to fix your computer.",
+    "A pop-up with a phone number that says your computer is infected is a scam. Close the browser, or restart the computer if it won't close. Don't call the number.",
+    "If you already let someone in: disconnect from the internet, call your bank, change your passwords from a different device, and have the computer checked by someone you trust." ],
+    res: [R_CAFC] },
+  "trusted": { title: "Choose a trusted person to call before you pay", mins: 10, steps: [
+    "Make a simple rule: before sending money because of a call or message, call a family member or friend first.",
+    "Investment firms in Canada must ask you for a 'trusted contact person', and some banks offer the same. Name someone you trust on your accounts.",
+    "Keep the Anti-Fraud Centre's number by the phone: 1-888-495-8501." ], res: [R_CAFC] },
+  "report": { title: "Know where to report a scam", mins: 2, steps: [
+    "If you sent money or shared banking details, call your bank right away.",
+    "Report it to the Canadian Anti-Fraud Centre at 1-888-495-8501 or online, and to your local police.",
+    "Reporting isn't embarrassing. Scams fool careful people every day, and reports help stop them." ], res: [R_CAFC] },
+  "auto-update": { title: "Turn on automatic updates", mins: 10, steps: [
+    "iPhone or iPad: Settings, General, Software Update, Automatic Updates.",
+    "Android: Settings, then System or Software update (the name varies by phone brand).",
+    "Windows: Settings, Windows Update. Mac: System Settings, General, Software Update.",
+    "Also turn on automatic app updates in the App Store or Google Play, and restart when your device asks." ],
+    res: [L("Canadian Centre for Cyber Security", "https://www.cyber.gc.ca/en")] },
+  "update-help": { title: "Ask someone you trust to set up updates with you", mins: 20, steps: [
+    "Sit down together and turn on automatic updates on each phone, tablet and computer.",
+    "Ask them to show you what an update message looks like, so you can tell it apart from a fake pop-up.",
+    "Many public libraries offer free tech help sessions, and Tech-Nest runs community workshops." ] },
+  "old-device": { title: "Plan to replace devices that no longer get updates", mins: 30, steps: [
+    "Devices that no longer get security fixes stay open to attacks found after support ended.",
+    "Windows 10 support ended on October 14, 2025. Older iPhones, iPads and Android phones stop getting updates too. Check the maker's website for your model.",
+    "Until you replace it, don't use that device for banking, shopping or email." ] },
+  "screen-lock": { title: "Set a screen lock on your phone", mins: 5, steps: [
+    "Use a PIN of 6 or more digits. Fingerprint or face unlock makes it quick to open.",
+    "Set the screen to lock itself after 1 or 2 minutes.",
+    "Turn on Find My (Apple) or Find My Device (Android) so you can locate or erase a lost phone." ] },
+  "stronger-lock": { title: "Use a stronger screen lock", mins: 5, steps: [
+    "Avoid 1234, 0000, repeated digits, your birth year, and simple patterns like an L or Z shape.",
+    "Choose 6 or more digits that mean nothing to anyone else, and use fingerprint or face unlock for convenience." ] },
+  "backup": { title: "Turn on automatic backups", mins: 15, steps: [
+    "iPhone: Settings, your name, iCloud, iCloud Backup. Android: Settings, then Google, then Backup.",
+    "Computer: use OneDrive or iCloud, or an external drive with Windows Backup or Mac Time Machine.",
+    "Backups save your photos if a device is lost, stolen or locked by ransomware." ] },
+  "backup-check": { title: "Check that your backup is really working", mins: 5, steps: [
+    "Look at the date of your last backup in your phone or computer's backup settings.",
+    "If it's older than a week, turn on automatic backup so you don't have to remember." ] },
+  "wifi": { title: "Be careful on public Wi-Fi", mins: 5, steps: [
+    "Ask staff for the exact network name. Scammers set up fake hotspots with names like 'Airport Free WiFi'.",
+    "Don't do banking or enter passwords on public Wi-Fi. Switch to mobile data for those.",
+    "Turn off 'auto-join' for public networks so your phone doesn't connect without asking.",
+    "If you use a VPN, pick a reputable paid one. Free VPNs often make money from your data." ] },
+  "wifi-device": { title: "Keep an un-updated device off public Wi-Fi", mins: 2, steps: [
+    "A device that's missing security updates is easier to attack, and public Wi-Fi puts it next to strangers.",
+    "Use mobile data or your own hotspot on that device until updates are on, or until you replace it." ] },
+  "social": { title: "Tighten your social media privacy", mins: 15, steps: [
+    "Set your profile and past posts to Friends only.",
+    "Hide your birthday, phone number and home address.",
+    "Post holiday photos after you're home, not while your house is empty.",
+    "Skip 'fun quiz' posts that ask your first car, pet's name or school. These are common security questions.",
+    "Be wary of a new friend request from someone already on your list. Scammers clone profiles." ] },
+  "ai-redact": { title: "Remove personal details before pasting into AI chats", mins: 2, steps: [
+    "Replace names, addresses, account numbers, health card and SIN numbers with placeholders like [NAME].",
+    "Describe medical or money situations in general terms rather than pasting real documents.",
+    "Don't upload confidential work files unless your employer has approved the tool." ] },
+  "ai-settings": { title: "Turn off AI training on your chats", mins: 5, steps: [
+    "ChatGPT: Settings, Data controls, turn off 'Improve the model for everyone'. Use Temporary Chat for sensitive questions.",
+    "Claude: Settings, Privacy, turn off 'Help improve Claude'.",
+    "Gemini and Copilot have similar options under Activity or Privacy. Names change often, so look for 'training' or 'activity'.",
+    "Turning training off doesn't erase what you've shared, so still remove personal details." ] },
+  "duck-ai": { title: "Try a private AI chat for sensitive topics", mins: 2, steps: [
+    "Duck.ai, from DuckDuckGo, lets you use several popular AI models with no account. It says your chats aren't used to train the models.",
+    "It's a good choice for health or money questions, but still leave out your name and numbers." ],
+    res: [L("Duck.ai", "https://duck.ai/")] },
+  "kids-controls": { title: "Set up parental controls and family rules", mins: 30, steps: [
+    "Use the free tools built into devices: Screen Time on Apple, Family Link on Android, Microsoft Family Safety on Windows and Xbox.",
+    "Keep devices for younger children in shared rooms, and agree on simple rules for apps, games and screen time.",
+    "Talk often. Let children know they can tell you about anything that upsets them online without losing their device." ],
+    res: [L("Protect Kids Online", "https://protectkidsonline.ca/"), L("Cybertip.ca", "https://www.cybertip.ca/"), L("NeedHelpNow.ca (for teens)", "https://needhelpnow.ca/")] },
+};
+
+/* ---------------- RULES ---------------- */
+/* level: critical > high > medium > low. Each rule's `when` is the human-readable condition shown in the team table. */
+const RULES = [
+  { id: "R1", name: "Password reuse", when: "Passwords = reuse", test: a => a.pw === "a", level: "high", actions: ["email-first", "pm", "breach"] },
+  { id: "R2", name: "Browser-saved passwords", when: "Passwords = browser", test: a => a.pw === "b", level: "low", actions: ["browser-pw", "passkeys"] },
+  { id: "R3", name: "Paper passwords", when: "Passwords = notebook", test: a => a.pw === "d", level: "low", actions: ["notebook", "breach"] },
+  { id: "R4", name: "No two-step verification", when: "2FA = none", test: a => a.tfa === "c", level: "high", actions: ["tfa-on"] },
+  { id: "R5", name: "Unknown two-step status", when: "2FA = not sure", test: a => a.tfa === "d", level: "medium", actions: ["tfa-check", "carrier-lock"] },
+  { id: "R6", name: "SIM-swap risk", when: "2FA = text message", test: a => a.tfa === "a", level: "medium", actions: ["tfa-app", "carrier-lock"] },
+  { id: "R7", name: "Phishing links", when: "Banking = links in messages", test: a => a.bank === "a", level: "high", actions: ["bookmark", "7726", "alerts"] },
+  { id: "R8", name: "Money-app accounts", when: "Banking = fintech apps", test: a => a.bank === "c", level: "medium", actions: ["fintech", "alerts"] },
+  { id: "R9", name: "Banking alerts", when: "Banking = app/bookmark", test: a => a.bank === "b", level: "low", actions: ["alerts"] },
+  { id: "R10", name: "e-Transfer interception", when: "Money = e-Transfer with question", test: a => a.money === "a", level: "medium", actions: ["autodeposit", "etransfer-send"] },
+  { id: "R11", name: "Irreversible payments", when: "Money = card or PayPal", test: a => a.money === "c", level: "low", actions: ["card-protect"] },
+  { id: "R12", name: "Impersonation scams", when: "Scam calls = follow instructions", test: a => a.calls === "a", level: "high", actions: ["hangup", "report"] },
+  { id: "R13", name: "Scam readiness", when: "Scam calls = not sure", test: a => a.calls === "c", level: "medium", actions: ["hangup", "report"] },
+  { id: "R14", name: "Tech-support scam", when: "Remote access = yes", test: a => a.remote === "a", level: "high", actions: ["remote"] },
+  { id: "R15", name: "Tech-support readiness", when: "Remote access = not sure", test: a => a.remote === "c", level: "medium", actions: ["remote"] },
+  { id: "R16", name: "Unpatched software", when: "Updates = postpone", test: a => a.updates === "a", level: "high", actions: ["auto-update"] },
+  { id: "R17", name: "Updates unknown", when: "Updates = don't know", test: a => a.updates === "c", level: "medium", actions: ["update-help", "auto-update"] },
+  { id: "R18", name: "Unsupported device", when: "Updates = too old", test: a => a.updates === "d", level: "high", actions: ["old-device"] },
+  { id: "R19", name: "Unlocked phone", when: "Lock = none", test: a => a.lock === "a", level: "high", actions: ["screen-lock"] },
+  { id: "R20", name: "Weak phone lock", when: "Lock = simple code", test: a => a.lock === "c", level: "medium", actions: ["stronger-lock"] },
+  { id: "R21", name: "No backup", when: "Backup = none", test: a => a.backup === "a", level: "medium", actions: ["backup"] },
+  { id: "R22", name: "Unreliable backup", when: "Backup = sometimes / not sure", test: a => a.backup === "c", level: "low", actions: ["backup-check"] },
+  { id: "R23", name: "Public Wi-Fi", when: "Wi-Fi = often public", test: a => a.wifi === "a", level: "medium", actions: ["wifi"] },
+  { id: "R24", name: "Oversharing", when: "Social = public, shares details", test: a => a.social === "a", level: "medium", actions: ["social"] },
+  { id: "R25", name: "AI data exposure", when: "AI = pastes personal data", test: a => a.ai === "a", level: "medium", actions: ["ai-redact", "ai-settings", "duck-ai"] },
+  { id: "R26", name: "AI training", when: "AI = general use", test: a => a.ai === "b", level: "low", actions: ["ai-settings"] },
+  { id: "R27", name: "Children unprotected", when: "Kids = yes, no controls", test: a => a.kids === "a", level: "medium", actions: ["kids-controls"] },
+  { id: "R28", name: "Account lockouts", when: "Problems include forgotten passwords", test: a => (a.probs || []).includes("passwords"), level: "medium", actions: ["account-recovery", "pm"] },
+  { id: "R29", name: "Storage full", when: "Problems include storage", test: a => (a.probs || []).includes("storage"), level: "low", actions: ["storage"] },
+  { id: "R30", name: "Slow or freezing device", when: "Problems include slow or crashing", test: a => (a.probs || []).some(v => v === "slow" || v === "crash"), level: "low", actions: ["slow-device"] },
+  { id: "R31", name: "Search-result scams", when: "When stuck = search Google/YouTube", test: a => a.fix === "b", level: "medium", actions: ["search-safe"] },
+  { id: "R32", name: "Problems left unsolved", when: "When stuck = leave it", test: a => a.fix === "f", level: "medium", actions: ["tech-helper"] },
+  { id: "R33", name: "Low confidence", when: "Confidence = not very / need help", test: a => a.confid === "c" || a.confid === "d", level: "low", actions: ["tech-helper"] },
+  { id: "R34", name: "Repair shop data", when: "When stuck = repair shop", test: a => a.fix === "e", level: "low", actions: ["repair-shop"] },
+  /* Combination rules: two answers together are riskier than either alone. */
+  { id: "C1", name: "One leak opens everything", when: "Passwords = reuse AND 2FA = none or not sure", test: a => a.pw === "a" && (a.tfa === "c" || a.tfa === "d"), level: "critical", actions: ["email-first", "tfa-on", "pm"],
+    note: "Reused passwords with no second step mean one leaked password can open your email, and from there, most of your accounts." },
+  { id: "C2", name: "High scam exposure", when: "Scam calls = follow/not sure AND Remote access = yes/not sure", test: a => ["a", "c"].includes(a.calls) && ["a", "c"].includes(a.remote), level: "critical", actions: ["hangup", "remote", "trusted"],
+    note: "Scammers often combine an urgent call with a request to 'connect to your computer'. Knowing these two rules protects you from the most common frauds against Canadians." },
+  { id: "C3", name: "Exposed device on open networks", when: "Updates = postpone or too old AND Wi-Fi = often public", test: a => ["a", "d"].includes(a.updates) && a.wifi === "a", level: "high", actions: ["wifi-device", "auto-update"] },
+  { id: "C4", name: "Phishing plus interceptable payments", when: "Banking = links AND Money = e-Transfer with question", test: a => a.bank === "a" && a.money === "a", level: "critical", actions: ["bookmark", "autodeposit"],
+    note: "Clicking banking links and using security-question e-Transfers is the exact pattern behind most e-Transfer fraud." },
+  { id: "C5", name: "Frequent problems, little support", when: "Problems daily/weekly AND Confidence = not very / need help", test: a => (a.freq === "a" || a.freq === "b") && (a.confid === "c" || a.confid === "d"), level: "medium", actions: ["tech-helper", "slow-device"],
+    note: "Running into problems often without reliable help is when people are most likely to call a fake support number or accept a stranger's 'fix'." },
+];
+
+/* Things the person is already doing well, shown as encouragement. */
+const STRENGTHS = [
+  [a => a.confid === "a", "You're confident fixing basic tech problems."],
+  [a => a.pw === "c", "You use a password manager. That's the single best password habit."],
+  [a => a.tfa === "b", "You use an authenticator app or passkey, the strongest common sign-in protection."],
+  [a => a.bank === "b", "You go to your bank directly instead of through links."],
+  [a => a.money === "b", "Autodeposit is on, so there's no security question to intercept."],
+  [a => a.calls === "b", "You hang up and call back on a number you trust. That stops most scams."],
+  [a => a.remote === "b", "You only let people you know work on your devices."],
+  [a => a.updates === "b", "Your devices update automatically."],
+  [a => a.lock === "b", "Your phone has a strong lock."],
+  [a => a.backup === "b", "Your photos and files back up automatically."],
+  [a => a.wifi === "b" || a.wifi === "c", "You're careful about Wi-Fi when you're out."],
+  [a => a.social === "b", "Your social media is private."],
+  [a => a.ai === "c" || a.ai === "b", "You keep personal details out of AI chats."],
+  [a => a.kids === "b", "You've set up parental controls or family rules."],
+];
+
+/* ---------------- ENGINE ---------------- */
+const RANK = { critical: 4, high: 3, medium: 2, low: 1 };
+const LEVEL_LABEL = { critical: "Fix first", high: "Important", medium: "Recommended", low: "Good to know" };
+const optLabel = (qid, v) => { const q = QUESTIONS.find(x => x.id === qid); if (!q) return "";
+  if (Array.isArray(v)) return v.map(x => (q.options.find(o => o.v === x) || {}).label).filter(Boolean).join(", ");
+  const o = q.options.find(x => x.v === v); return o ? o.label : ""; };
+
+function evaluate(a) {
+  const fired = RULES.filter(r => { try { return r.test(a); } catch (e) { return false; } });
+  const byAction = new Map();
+  for (const r of fired) {
+    for (const id of r.actions) {
+      const def = ACTIONS[id];
+      if (!byAction.has(id)) byAction.set(id, { id, ...def, level: r.level, rules: [] });
+      const item = byAction.get(id);
+      if (RANK[r.level] > RANK[item.level]) item.level = r.level;
+      item.rules.push(r);
+    }
+  }
+  const actions = [...byAction.values()].sort((x, y) => RANK[y.level] - RANK[x.level] || x.mins - y.mins);
+  const notes = fired.filter(r => r.note);
+  const strengths = STRENGTHS.filter(([t]) => t(a)).map(([, s]) => s);
+  const counts = { critical: 0, high: 0, medium: 0, low: 0 };
+  actions.forEach(x => counts[x.level]++);
+  return { fired, actions, notes, strengths, counts };
+}
+
+/* Reasons shown on each card come from the answers that triggered the rules. */
+function reasonsFor(item, a) {
+  const qids = new Set();
+  for (const r of item.rules) for (const q of QUESTIONS) if (r.test.toString().includes("a." + q.id)) qids.add(q.id);
+  return [...qids].map(id => optLabel(id, a[id])).filter(Boolean);
+}
+
+/* ---------------- UI ---------------- */
+const $ = s => document.querySelector(s);
+let answers = {}, idx = 0, viewingExample = null;
+const store = {
+  get() { try { return JSON.parse(localStorage.getItem("tn-guide") || "null"); } catch (e) { return null; } },
+  set(v) { try { localStorage.setItem("tn-guide", JSON.stringify(v)); } catch (e) {} },
+  clear() { try { localStorage.removeItem("tn-guide"); } catch (e) {} },
+};
+
+function show(view) {
+  $("#intro").hidden = view !== "intro";
+  $("#quiz").hidden = view !== "quiz";
+  $("#results").hidden = view !== "results";
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[idx], n = QUESTIONS.length, last = idx === n - 1;
+  const pct = Math.round((idx / n) * 100);
+  $("#quiz").innerHTML = `
+    <div class="progress">
+      <div class="meta"><span>Question ${idx + 1} of ${n}</span><span>${q.topic}</span></div>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${idx}" aria-label="Progress"><i style="width:${pct}%"></i></div>
+    </div>
+    <fieldset>
+      <legend id="qlegend" tabindex="-1">${q.text}</legend>
+      ${q.help ? `<p class="help">${q.help}</p>` : ""}
+      <div class="opts">
+        ${q.options.map(o => `<label class="opt" for="q-${q.id}-${o.v}">
+          <input type="${q.multi ? "checkbox" : "radio"}" name="q-${q.id}" id="q-${q.id}-${o.v}" value="${o.v}" ${(q.multi ? (answers[q.id] || []).includes(o.v) : answers[q.id] === o.v) ? "checked" : ""}>
+          <span>${o.label}</span></label>`).join("")}
+      </div>
+    </fieldset>
+    <div class="nav">
+      <button id="backBtn" ${idx === 0 ? "" : ""}>${idx === 0 ? "Back to start" : "Back"}</button>
+      <div class="row">
+        <button class="link" id="skipBtn">Skip this question</button>
+        <button class="primary" id="nextBtn">${last ? "See my plan" : "Next"}</button>
+      </div>
+    </div>`;
+  $("#quiz").querySelectorAll("input").forEach(inp => inp.addEventListener("change", e => {
+    if (q.multi) {
+      const boxes = [...$("#quiz").querySelectorAll("input")];
+      /* "None of these" can't be combined with other choices. */
+      if (e.target.value === "none" && e.target.checked) boxes.forEach(b => { if (b.value !== "none") b.checked = false; });
+      else if (e.target.checked) boxes.forEach(b => { if (b.value === "none") b.checked = false; });
+      const vals = boxes.filter(b => b.checked).map(b => b.value);
+      if (vals.length) answers[q.id] = vals; else delete answers[q.id];
+    } else answers[q.id] = e.target.value;
+    store.set({ answers, idx });
+  }));
+  $("#backBtn").onclick = () => { if (idx === 0) { show("intro"); refreshResume(); } else { idx--; renderQuestion(); } };
+  $("#skipBtn").onclick = () => { delete answers[q.id]; next(); };
+  $("#nextBtn").onclick = next;
+  $("#qlegend").focus({ preventScroll: true });
+  window.scrollTo({ top: 0 });
+}
+function next() {
+  if (idx < QUESTIONS.length - 1) { idx++; store.set({ answers, idx }); renderQuestion(); }
+  else { store.set({ answers, idx, done: true }); viewingExample = null; renderResults(answers); }
+}
+
+const check = `<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+function renderAction(item, a) {
+  const steps = typeof item.steps === "function" ? item.steps(a) : item.steps;
+  const reasons = reasonsFor(item, a);
+  return `<article class="action ${item.level}">
+    <header><h4>${item.title}</h4><span class="pill l-${item.level}">${LEVEL_LABEL[item.level]}</span></header>
+    ${reasons.length ? `<ul class="why">${reasons.map(r => `<li>${r}</li>`).join("")}</ul>` : ""}
+    <ol>${steps.map(s => `<li>${s}</li>`).join("")}</ol>
+    <div class="res"><span class="time">About ${item.mins} min</span>${(item.res || []).map(r => `<a href="${r.u}" target="_blank" rel="noopener">${r.t}</a>`).join("")}</div>
+  </article>`;
+}
+
+function renderResults(a, exampleName) {
+  const r = evaluate(a);
+  const answered = Object.keys(a).length;
+  const groups = [
+    { key: ["critical", "high"], title: "Start here", sub: "These protect you from the most common and costly problems." },
+    { key: ["medium"], title: "Next steps", sub: "Worth doing in the next few weeks." },
+    { key: ["low"], title: "Good to know", sub: "Small improvements when you have a moment." },
+  ];
+  const top = r.actions.slice(0, 3);
+  $("#results").innerHTML = `
+    <div class="summary">
+      <p class="eyebrow">${exampleName ? "Example plan: " + exampleName : "Your safety plan"}</p>
+      <h2>${r.actions.length === 0 ? "You're in great shape" : `${r.actions.length} steps to stay safer online`}</h2>
+      ${top.length ? `<p style="margin:0">If you only do three things, do these: <b>${top.map(t => t.title.charAt(0).toLowerCase() + t.title.slice(1)).join("</b>; <b>")}</b>.</p>` : ""}
+      <p class="help" style="margin:0">Based on ${answered} of ${QUESTIONS.length} answers. ${exampleName ? "These are made-up example answers." : "Your answers stay on this device."}</p>
+      <div class="row">
+        <button class="primary small" id="copyBtn">Copy my plan</button>
+        <button class="small" id="editBtn">${exampleName ? "Take the check-up myself" : "Change my answers"}</button>
+        <button class="small" id="restartBtn">Start over</button>
+      </div>
+    </div>
+    ${r.notes.map(n => `<div class="callout" style="margin-top:20px"><b>Why ${n.name.toLowerCase()} matters</b><span>${n.note}</span></div>`).join("")}
+    ${groups.map((g, gi) => { const items = r.actions.filter(x => g.key.includes(x.level)); if (!items.length) return "";
+      /* Long plans: keep the first group open and fold later groups so the list doesn't overwhelm. */
+      const fold = gi > 0 && r.actions.length > 8;
+      return fold ? `<details class="group fold" style="margin-top:26px"><summary><h3>${g.title} (${items.length})</h3><span>${g.sub} Tap to open.</span></summary><div class="group">${items.map(i => renderAction(i, a)).join("")}</div></details>`
+        : `<div class="group" style="margin-top:26px"><h3>${g.title}</h3><p>${g.sub}</p>${items.map(i => renderAction(i, a)).join("")}</div>`; }).join("")}
+    ${r.strengths.length ? `<div class="group" style="margin-top:26px"><h3>You're already doing well</h3>
+      <ul class="strengths">${r.strengths.map(s => `<li>${check}<span>${s}</span></li>`).join("")}</ul></div>` : ""}
+    ${exampleName ? "" : `<div class="share" style="margin-top:26px">
+      <h3>Help Tech-Nest improve its workshops</h3>
+      <p>You can share your answers anonymously. We'll receive only your answers and the steps this guide suggested. No name, email or contact details are collected.</p>
+      <div class="row"><button class="primary small" id="shareBtn">Share my answers anonymously</button><span id="shareStatus" class="help" style="margin:0" role="status"></span></div>
+    </div>`}
+    <div class="group" style="margin-top:26px"><h3>If something has already gone wrong</h3>
+      <div class="action"><ol>
+        <li>Call your bank right away using the number on the back of your card.</li>
+        <li>Report it to the Canadian Anti-Fraud Centre: <b>1-888-495-8501</b>, or <a href="https://antifraudcentre-centreantifraude.ca/" target="_blank" rel="noopener">report online</a>. Also tell your local police.</li>
+        <li>Change your email password first, from a device you trust, then your other passwords.</li>
+      </ol></div>
+    </div>`;
+  $("#copyBtn").onclick = () => copyPlan(r, a);
+  if ($("#shareBtn")) $("#shareBtn").onclick = () => shareAnswers(r, a);
+  $("#editBtn").onclick = () => { if (exampleName) { answers = {}; } idx = 0; show("quiz"); renderQuestion(); };
+  $("#restartBtn").onclick = () => { answers = {}; idx = 0; store.clear(); show("intro"); refreshResume(); window.scrollTo({ top: 0 }); };
+  show("results");
+  window.scrollTo({ top: 0 });
+}
+
+/* ---------------- ANONYMOUS SHARING ----------------
+   Paste the Google Apps Script web app URL here (see SETUP-GOOGLE-SHEET.md).
+   Leave it empty and the share button explains that sharing isn't set up yet. */
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwT7gpvLtShE1tlSwhgOhwvGuBST-T03iyOszVcB9LkGKwQ23n10Z8RdEsYqC9yMXxn/exec";
+const GUIDE_VERSION = "2026-11";
+
+function buildRow(r, a) {
+  const row = { guide_version: GUIDE_VERSION, submitted_at: new Date().toISOString() };
+  QUESTIONS.forEach((q, i) => { row[`Q${i + 1} ${q.short || q.topic}`] = optLabel(q.id, a[q.id]) || "(skipped)"; });
+  row["Steps suggested"] = r.actions.map(x => x.title).join(" | ");
+  row["Number of steps"] = r.actions.length;
+  row["Top priority steps"] = r.actions.filter(x => x.level === "critical" || x.level === "high").length;
+  return row;
+}
+function shareAnswers(r, a) {
+  const btn = $("#shareBtn"), status = $("#shareStatus");
+  if (!SHEET_URL) { status.textContent = "Sharing isn't connected yet. It will work once the site is hosted and linked to Tech-Nest's Google Sheet."; return; }
+  btn.disabled = true; status.textContent = "Sending…";
+  /* text/plain avoids a CORS preflight; Apps Script reads the body as JSON. */
+  fetch(SHEET_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(buildRow(r, a)) })
+    .then(() => { status.textContent = "Thank you. Your answers were shared anonymously."; btn.textContent = "Shared"; })
+    .catch(() => { btn.disabled = false; status.textContent = "Couldn't send. Check your internet connection and try again."; });
+}
+
+function copyPlan(r, a) {
+  const lines = ["My Tech-Nest digital safety plan", ""];
+  r.actions.forEach((x, i) => {
+    lines.push(`${i + 1}. ${x.title} [${LEVEL_LABEL[x.level]}, about ${x.mins} min]`);
+    (typeof x.steps === "function" ? x.steps(a) : x.steps).forEach(s => lines.push("   - " + s));
+    lines.push("");
+  });
+  lines.push("Lost money to a scam? Call your bank, then the Canadian Anti-Fraud Centre: 1-888-495-8501.");
+  const text = lines.join("\n");
+  const done = () => toast("Plan copied. You can paste it into an email or note.");
+  try {
+    navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done));
+  } catch (e) { fallbackCopy(text, done); }
+}
+function fallbackCopy(text, done) {
+  const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  let ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+  ta.remove(); ok ? done() : toast("Couldn't copy automatically. Select the text on the page instead.");
+}
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => t.hidden = true, 3200); }
+
+function refreshResume() {
+  const s = store.get();
+  const has = s && s.answers && Object.keys(s.answers).length;
+  $("#resumeBtn").hidden = !has;
+  $("#resumeBtn").textContent = s && s.done ? "See my last plan" : "Continue where I left off";
+}
+
+$("#startBtn").onclick = () => { answers = {}; idx = 0; show("quiz"); renderQuestion(); };
+$("#resumeBtn").onclick = () => { const s = store.get(); if (!s) return; answers = s.answers || {}; idx = Math.min(s.idx || 0, QUESTIONS.length - 1); if (s.done) renderResults(answers); else { show("quiz"); renderQuestion(); } };
+$("#sizeBtn").onclick = () => {
+  const on = document.documentElement.classList.toggle("big");
+  $("#sizeBtn").setAttribute("aria-pressed", on); $("#sizeBtn").textContent = on ? "Normal text" : "Larger text";
+  try { localStorage.setItem("tn-big", on ? "1" : ""); } catch (e) {}
+};
+try { if (localStorage.getItem("tn-big")) $("#sizeBtn").click(); } catch (e) {}
+refreshResume();
+</script>
+
+</body>
+</html>
